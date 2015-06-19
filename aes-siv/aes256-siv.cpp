@@ -21,12 +21,6 @@ void aes256_siv_s2v(AES *ctx, const uint8_t *header_data,
 	const size_t *header_sizes, const uint8_t header_sizes_len,
 	const uint8_t *plaintext, const size_t plaintext_len, uint8_t *mac)
 {
-	if (header_sizes_len == 0 && plaintext_len == 0)
-	{
-		aes256_cmac(ctx, aes256_siv_one_block, 16, mac);
-		return;
-	}
-
 	uint8_t headers = (plaintext_len == 0 ? header_sizes_len - 1 : header_sizes_len);
 
 	size_t header_loc = 0;
@@ -41,18 +35,8 @@ void aes256_siv_s2v(AES *ctx, const uint8_t *header_data,
 		header_loc += header_size;
 	}
 
-	const uint8_t *last_part;
-	size_t last_part_len;
-	if (plaintext_len == 0)
-	{
-		last_part = &header_data[header_loc];
-		last_part_len = header_sizes[(header_sizes_len - 1)];
-	}
-	else
-	{
-		last_part = plaintext;
-		last_part_len = plaintext_len;
-	}
+	const uint8_t *last_part = plaintext;
+	size_t last_part_len = plaintext_len;
 
 	if (last_part_len >= 16)
 	{
